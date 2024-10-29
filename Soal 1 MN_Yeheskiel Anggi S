@@ -1,0 +1,45 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import bisect, newton
+
+# Konstanta
+L = 0.5  # Henry
+C = 10e-6  # Farad
+f_target = 1000  # Hz
+R_values = [50, 100, 150]  # Ohm
+
+# Fungsi resonansi
+def resonant_frequency(R, L, C):
+    return (1 / (2 * np.pi)) * np.sqrt((1 / (L * C)) - (R**2 / (4 * L**2)))
+
+# (a) Fungsi frekuensi resonansi untuk rentang R tertentu
+def plot_resonant_frequency(R_values, L, C):
+    frequencies = [resonant_frequency(R, L, C) for R in R_values]
+    plt.plot(R_values, frequencies, label="f(R)")
+    plt.xlabel("R (Ohm)")
+    plt.ylabel("Frekuensi Resonansi (Hz)")
+    plt.title("Frekuensi Resonansi vs Resistansi")
+    plt.legend()
+    plt.show()
+
+# Plot untuk frekuensi resonansi pada rentang R
+plot_resonant_frequency(np.linspace(0, 200, 500), L, C)
+
+# (b) Metode Bisection
+def find_frequency_bisection(R, L, C, target_f):
+    func = lambda R: resonant_frequency(R, L, C) - target_f
+    return bisect(func, 0, 200)
+
+# Mencari nilai R untuk f = 1000 Hz dengan metode Bisection
+for R in R_values:
+    R_found = find_frequency_bisection(R, L, C, f_target)
+    print(f"Metode Bisection: R = {R_found} Ohm untuk frekuensi {f_target} Hz")
+
+# (c) Metode Newton-Raphson
+def find_frequency_newton(R, L, C, target_f):
+    func = lambda R: resonant_frequency(R, L, C) - target_f
+    return newton(func, R)
+
+for R in R_values:
+    R_found = find_frequency_newton(R, L, C, f_target)
+    print(f"Metode Newton-Raphson: R = {R_found} Ohm untuk frekuensi {f_target} Hz")
